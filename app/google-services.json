@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "331846051993",
+    "project_id": "car-show-room-3c94f",
+    "storage_bucket": "car-show-room-3c94f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331846051993:android:25dff727e210f98e23b008",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd1fpnQpgUF6dG5kWhOLP0oxtDUzxAVI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

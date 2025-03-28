@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.database)
     implementation("com.google.firebase:firebase-auth:22.3.1")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)

@@ -30,7 +30,7 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ImageView profileImage;
     private TextView nameTextView, emailTextView;
-    private LinearLayout accountInfoLayout;
+    private LinearLayout accountInfoLayout, logoutButton;
     private Button returnUser;
 
     @Override
@@ -44,6 +44,12 @@ public class SettingActivity extends AppCompatActivity {
             return insets;
         });
 
+        initView();
+        setUpClickListener();
+        loadUserProfile();
+    }
+
+    private void initView(){
         // khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
 
@@ -53,29 +59,31 @@ public class SettingActivity extends AppCompatActivity {
         emailTextView = findViewById(R.id.emailTextView);
         accountInfoLayout = findViewById(R.id.accountInfoLayout);
         returnUser = findViewById(R.id.returnUser);
+        logoutButton = findViewById(R.id.logoutButton);
+    }
 
-    // Account Information Click
-        findViewById(R.id.accountInfoLayout).setOnClickListener(v -> {
-            // Navigate đến Account Information
+    private void setUpClickListener(){
+        returnUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SettingActivity.this, MainActivity.class));
+                finish();
+            }
+        });
+
+        accountInfoLayout.setOnClickListener(v -> {
+            //Chuyển trang đến Account Information
             Toast.makeText(this, "Thông tin cá nhân", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, EditProfileActivity.class));
         });
 
         // Logout Click
-        findViewById(R.id.logoutButton).setOnClickListener(v -> {
+        logoutButton.setOnClickListener(v -> {
             mAuth.signOut();
             // Chuyển trang về Login
             startActivity(new Intent(this, SignInActivity.class));
             finishAffinity();
         });
-
-        returnUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(SettingActivity.this, MainActivity.class));
-            }
-        });
-
-        loadUserProfile();
     }
 
     private void loadUserProfile() {
@@ -93,6 +101,14 @@ public class SettingActivity extends AppCompatActivity {
                         String email = dataSnapshot.child("email").getValue(String.class);
                         emailTextView.setText(email);
                         nameTextView.setText(username);
+                        String avatar = dataSnapshot.child("avatar").getValue(String.class);
+                        if(avatar != null && !avatar.isEmpty()){
+                            Glide.with(SettingActivity.this)
+                                    .load(avatar)
+                                    .placeholder(R.drawable.default_profile) // Ảnh mặc định khi đang tải
+                                    .error(R.drawable.default_profile) // Ảnh hiển thị nếu lỗi
+                                    .into(profileImage);
+                        }
                         Log.d("UserProfile", "Username: " + username);
                     } else {
                         Log.d("UserProfile", "User data not found.");

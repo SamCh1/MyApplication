@@ -23,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class CarDetailActivity extends AppCompatActivity {
     private RatingBar carRating;
     private Button bookTestDriveButton;
     private String carId;
+    private String carSlug;
     private Car carData;
     private DatabaseReference databaseReference;
     private CarImageSliderAdapter imageAdapter;
@@ -48,7 +50,8 @@ public class CarDetailActivity extends AppCompatActivity {
 
         // lấy dữ id car từ intent
         carId = getIntent().getStringExtra("CAR_ID");
-        if (carId == null) {
+        carSlug = getIntent().getStringExtra("slug");
+        if (carId == null && carSlug == null) {
             Toast.makeText(this, "Error: Không thấy dữ liệu xe", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -100,27 +103,56 @@ public class CarDetailActivity extends AppCompatActivity {
     }
 
     private void loadCarDataFromFirebase() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Cars").child(carId);
+        if(carId != null){
+            databaseReference = FirebaseDatabase.getInstance().getReference("Cars").child(carId);
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                carData = dataSnapshot.getValue(Car.class);
-                if (carData != null) {
-                    displayCarData();
-                } else {
-                    Toast.makeText(CarDetailActivity.this, "Car data not found", Toast.LENGTH_SHORT).show();
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    carData = dataSnapshot.getValue(Car.class);
+                    if (carData != null) {
+                        displayCarData();
+                    } else {
+                        Toast.makeText(CarDetailActivity.this, "Car data not found", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(CarDetailActivity.this, "Error loading car details: " + databaseError.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                     finish();
                 }
-            }
+            });
+        } else if(carSlug != null){
+            databaseReference = FirebaseDatabase.getInstance().getReference("Cars");
+            Query query = databaseReference.orderByChild("slug").equalTo(carSlug);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        carData = dataSnapshot.getValue(Car.class);
+                        if (carData != null) {
+                            displayCarData();
+                        } else {
+                            Toast.makeText(CarDetailActivity.this, "Car data not found", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(CarDetailActivity.this, "Error loading car details: " + databaseError.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(CarDetailActivity.this, "Error loading car details: " + error.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+        }
+
     }
 
     private void displayCarData() {

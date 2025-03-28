@@ -15,6 +15,7 @@ public class Car {
     private String Speed;
     private String seat;
     private String ratting;
+    private String slug;
     private boolean favorite;
 
 
@@ -24,7 +25,7 @@ public class Car {
 
     public Car(String id, String title, String image, List<String> images, String price, String description,
                String horsepower, String consume, String Speed, String seat,
-               String ratting, boolean favorite) {
+               String ratting, String slug, boolean favorite) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -37,6 +38,7 @@ public class Car {
         this.seat = seat;
         this.ratting = ratting;
         this.favorite = favorite;
+        this.slug = slug;
     }
 
     public List<String> getImages() {
@@ -135,6 +137,10 @@ public class Car {
     public void setRatting(String ratting) {
         this.ratting = ratting;
     }
+
+    public String getSlug() {return slug;}
+
+    public void setSlug(String slug) { this.slug = slug;}
 
     public boolean isFavorite() {
         return favorite;

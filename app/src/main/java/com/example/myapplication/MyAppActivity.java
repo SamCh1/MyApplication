@@ -1,216 +1,199 @@
 package com.example.myapplication;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
-
+import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Multipart;
-import retrofit2.http.POST;
-import retrofit2.http.Part;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MyAppActivity extends AppCompatActivity {
-    private static final String TAG = "MyAppActivity";
-    private static final int CAMERA_REQUEST_CODE = 100;
-    private static final int PERMISSION_REQUEST_CODE = 101;
+    private static final int REQUEST_STORAGE_PERMISSION = 1;
+    private static final int PICK_IMAGE_REQUEST = 2;
 
-    // Roboflow configuration
-    private static final String ROBOFLOW_BASE_URL = "https://api.roboflow.com/";
-    private static final String ROBOFLOW_API_KEY = "kTLMAfCSw1zE9PQvxBBt"; // Replace with your actual key
-    private static final String ROBOFLOW_DATASET = "audi_detection"; // Your dataset name
-
-    private ImageView imageView;
-    private File photoFile;
+    private TextView responseTextView;
+    private Button btnSelectImage;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_app);
 
-        // Initialize UI components
-        imageView = findViewById(R.id.imageView);
-        Button btnCapture = findViewById(R.id.btnCapture);
-        Button btnUpload = findViewById(R.id.btnUpload);
+        responseTextView = findViewById(R.id.responseTextView);
+        btnSelectImage = findViewById(R.id.btnSelectImage); // Khởi tạo nút
 
-        // Set click listeners
-        btnCapture.setOnClickListener(v -> checkPermissionAndCapture());
-        btnUpload.setOnClickListener(v -> uploadImageToRoboflow());
+        // Kiểm tra quyền truy cập bộ nhớ
+        checkPermissions();
+
+        btnSelectImage.setOnClickListener(view -> openGallery());
     }
 
-    // Check and request camera and storage permissions
-    private void checkPermissionAndCapture() {
-        String[] permissions = {
-                Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        };
-
-        boolean allPermissionsGranted = true;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                allPermissionsGranted = false;
-                break;
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ cần quyền mới
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                        REQUEST_STORAGE_PERMISSION);
+            }
+        } else {
+            // Android 12 trở xuống
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_STORAGE_PERMISSION);
             }
         }
-
-        if (allPermissionsGranted) {
-            captureImage();
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
-        }
     }
 
-    // Launch camera intent to capture image
-    private void captureImage() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
-        } else {
-            Toast.makeText(this, "Không tìm thấy ứng dụng Camera", Toast.LENGTH_SHORT).show();
-        }
+    // Mở thư viện ảnh
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    // Handle image capture result
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data != null && data.getExtras() != null) {
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
-                if (photo != null) {
-                    imageView.setImageBitmap(photo);
-                    photoFile = saveBitmapToFile(photo);
-                }
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                new UploadImageTask().execute(imageUri);
             }
         }
     }
 
-    // Save captured bitmap to file
-    private File saveBitmapToFile(Bitmap bitmap) {
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "captured_image.jpg");
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            // Compress bitmap to reduce file s
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
-            out.flush();
-            Log.d(TAG, "Image saved: " + file.getAbsolutePath());
-        } catch (IOException e) {
-            Log.e(TAG, "Error saving image", e);
-            Toast.makeText(this, "Lỗi lưu ảnh", Toast.LENGTH_SHORT).show();
+    private class UploadImageTask extends AsyncTask<Uri, Void, String> {
+        @Override
+        protected String doInBackground(Uri... uris) {
+            HttpURLConnection connection = null;
+            DataOutputStream outputStream = null;
+            InputStream inputStream = null;
+
+            try {
+                Uri imageUri = uris[0];
+                inputStream = getContentResolver().openInputStream(imageUri);
+                if (inputStream == null) return "Lỗi: Không thể đọc ảnh";
+
+                String API_KEY = "kTLMAfCSw1zE9PQvxBBt";
+                String MODEL_ENDPOINT = "audi_detection/1";
+                String uploadURL = "https://detect.roboflow.com/" + MODEL_ENDPOINT + "?api_key=" + API_KEY;
+
+                // **Tạo boundary ngẫu nhiên**
+                String boundary = "----WebKitFormBoundary" + System.currentTimeMillis();
+                URL url = new URL(uploadURL);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                connection.setDoOutput(true);
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
+
+                outputStream = new DataOutputStream(connection.getOutputStream());
+
+                // **Thêm dữ liệu ảnh vào request**
+                outputStream.writeBytes("--" + boundary + "\r\n");
+                outputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"image.jpg\"\r\n");
+                outputStream.writeBytes("Content-Type: image/jpeg\r\n\r\n");
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.writeBytes("\r\n");
+
+                // **Kết thúc multipart request**
+                outputStream.writeBytes("--" + boundary + "--\r\n");
+                outputStream.flush();
+                outputStream.close();
+
+                // **Lấy phản hồi từ server**
+                int responseCode = connection.getResponseCode();
+                Log.d("HTTP Response", "Code: " + responseCode);
+
+                InputStream responseStream = new BufferedInputStream(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                return response.toString();
+
+            } catch (Exception e) {
+                return "Lỗi: " + e.getMessage();
+            } finally {
+                try {
+                    if (inputStream != null) inputStream.close();
+                    if (connection != null) connection.disconnect();
+                } catch (IOException ignored) {
+                }
+            }
         }
-        return file;
-    }
 
-    // Upload image to Roboflow
-    private void uploadImageToRoboflow() {
-        // Check if image exists
-        if (photoFile == null || !photoFile.exists()) {
-            Toast.makeText(this, "Chưa có ảnh để tải lên!", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+                JSONObject jsonResponse = new JSONObject(result);
+                JSONArray predictions = jsonResponse.getJSONArray("predictions");
 
-        // Check network connectivity
-        if (!isNetworkAvailable()) {
-            Toast.makeText(this, "Không có kết nối internet!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Create Retrofit instance
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ROBOFLOW_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        // Create API service
-        RoboflowApi roboflowApi = retrofit.create(RoboflowApi.class);
-
-        // Prepare file for upload
-        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), photoFile);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", photoFile.getName(), requestFile);
-        RequestBody apiKey = RequestBody.create(MediaType.parse("text/plain"), ROBOFLOW_API_KEY);
-
-        // Make API call
-        roboflowApi.uploadImage(body, apiKey).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "Upload successful: " + response.body());
-                    Toast.makeText(MyAppActivity.this, "Tải lên thành công!", Toast.LENGTH_SHORT).show();
+                if (predictions.length() == 0) {
+                    responseTextView.setText("Không tìm thấy đối tượng nào!");
                 } else {
-                    Log.e(TAG, "Upload failed: " + response.message());
-                    Toast.makeText(MyAppActivity.this, "Lỗi tải lên: " + response.message(), Toast.LENGTH_SHORT).show();
+                    StringBuilder classes = new StringBuilder("Phát hiện: ");
+                    for (int i = 0; i < predictions.length(); i++) {
+                        JSONObject obj = predictions.getJSONObject(i);
+                        String detectedClass = obj.getString("class");
+                        Intent intent = new Intent(MyAppActivity.this, CarDetailActivity.class);
+                        intent.putExtra("slug", detectedClass);
+                        startActivity(intent);
+                        finish();
+                    }
+                    responseTextView.setText(classes.toString());
                 }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                Log.e(TAG, "Network error", t);
-                Toast.makeText(MyAppActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    // Check network availability
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    // Handle permission request results
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-
-            if (allPermissionsGranted) {
-                captureImage();
-            } else {
-                Toast.makeText(this, "Quyền bị từ chối!", Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                responseTextView.setText("Lỗi xử lý JSON: " + e.getMessage());
             }
         }
     }
 
-    // Roboflow API interface
-    interface RoboflowApi {
-        @Multipart
-        @POST("dataset/" + ROBOFLOW_DATASET + "/upload")
-        Call<String> uploadImage(
-                @Part MultipartBody.Part file,
-                @Part("api_key") RequestBody apiKey
-        );
+
+    // Xử lý kết quả yêu cầu quyền
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGallery();
+            } else {
+                responseTextView.setText("Cần cấp quyền để chọn ảnh!");
+            }
+        }
     }
 }

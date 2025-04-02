@@ -13,8 +13,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +53,15 @@ public class SignUpActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Find the top LinearLayout
+        LinearLayout topLinearLayout = findViewById(R.id.main).findViewById(R.id.top_linear_layout);
+
+        // Load the animation
+        Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+
+        // Apply the animation to the LinearLayout
+        topLinearLayout.startAnimation(slideUp);
 
         //khởi tạo auth firebase
         mAuth = FirebaseAuth.getInstance();

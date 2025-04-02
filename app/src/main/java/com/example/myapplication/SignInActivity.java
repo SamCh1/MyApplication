@@ -14,8 +14,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +34,7 @@ public class SignInActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private TextView tvSignUp, tvForgotPassword;
+    private LinearLayout top_linear_layout;
 
     private FirebaseAuth mAuth;
 
@@ -43,6 +48,15 @@ public class SignInActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Find the top LinearLayout
+        LinearLayout topLinearLayout = findViewById(R.id.main).findViewById(R.id.top_linear_layout);
+
+        // Load the animation
+        Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+
+        // Apply the animation to the LinearLayout
+        topLinearLayout.startAnimation(slideUp);
 
         //khởi tạo auth firebase
         mAuth = FirebaseAuth.getInstance();

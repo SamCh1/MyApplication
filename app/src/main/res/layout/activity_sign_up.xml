@@ -15,6 +15,7 @@
         android:src="@drawable/background" />
 
     <LinearLayout
+        android:id="@+id/top_linear_layout"
         android:layout_marginTop="150dp"
         android:background="@drawable/rounded_background"
         android:layout_width="match_parent"

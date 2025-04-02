@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private NestedScrollView nestedScrollView;
     private FeatureAdapter featureAdapter;
     private TextView bannerTitle, bannerSubtitle, powerText, accelerationText, batteryText;
+    private Handler handler = new Handler();
 
 
     @Override
@@ -182,6 +184,37 @@ public class MainActivity extends AppCompatActivity {
 
         // Fetch data từ Firebase
         fetchFeaturedCars();
+
+        final Runnable update = new Runnable() {
+            public void run() {
+                int currentPage = carImageViewPager.getCurrentItem();
+                int totalItems = carImageAdapter.getItemCount();
+                if (totalItems > 0) {
+                    if (currentPage == totalItems - 1) {
+                        carImageViewPager.setCurrentItem(0);
+                    } else {
+                        carImageViewPager.setCurrentItem(currentPage + 1);
+                    }
+                }
+            }
+        };
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 3000);
+                update.run();
+            }
+        }, 3000);
+
+        carImageViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                handler.removeCallbacks(update); // Dừng tự động chuyển
+                handler.postDelayed(update, 3000); // Bắt đầu lại sau 3 giây
+            }
+        });
     }
 
     private void setupButtons() {

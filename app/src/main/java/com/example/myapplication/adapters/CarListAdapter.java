@@ -80,7 +80,7 @@ public class CarListAdapter extends RecyclerView.Adapter<CarListAdapter.CarViewH
             }
         });
 
-        // Add click listener to the entire card view
+        // Them click listener den card view
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, CarDetailActivity.class);
             // Pass the car ID to fetch detailed data from Firebase in the detail activity
@@ -94,7 +94,7 @@ public class CarListAdapter extends RecyclerView.Adapter<CarListAdapter.CarViewH
         return carList.size();
     }
 
-    // Update the list when data changes
+    // Cap nhat lai danh sach
     public void updateList(List<CarList> newList) {
         this.carList = newList;
         notifyDataSetChanged();

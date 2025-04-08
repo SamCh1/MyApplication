@@ -231,8 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
         buildYourBtn.setOnClickListener(v -> {
             Toast.makeText(MainActivity.this, "Build your own car", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(MainActivity.this, CarListActivity.class));
-            finish();
+            startActivity(new Intent(MainActivity.this, ProductListActivity.class));
         });
 
         contactBtn.setOnClickListener(v -> {

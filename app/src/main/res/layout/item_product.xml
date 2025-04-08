@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/product_image"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:src="@drawable/product_test"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_image"
+            android:clipToOutline="true"
+            android:outlineProvider="background" />
+
+        <TextView
+            android:id="@+id/product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/be_vietnam_pro_bold"
+            android:text="Van tách dầu xe Audi Q5 WA1LFAFP1BA020349 chính hãng"
+            android:textSize="16sp"
+            android:textColor="#212121"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:paddingTop="8dp" />
+
+        <TextView
+            android:id="@+id/product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/be_vietnam_pro_bold"
+            android:text="2.450.000 VNĐ"
+            android:textColor="#E91E63"
+            android:textSize="15sp"
+            android:paddingTop="6dp" />
+
+        <Button
+            android:id="@+id/add_to_cart_btn"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="Thêm vào giỏ"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:background="@drawable/button_background"
+            app:backgroundTint="@color/button_green"
+            android:textColor="@color/white"
+            android:backgroundTint="#1976D2"
+            android:layout_marginTop="10dp"
+            android:stateListAnimator="@null"
+            android:elevation="2dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

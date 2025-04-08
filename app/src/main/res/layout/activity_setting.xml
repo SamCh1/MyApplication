@@ -81,34 +81,6 @@
                 android:layout_marginEnd="16dp"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/favoriteUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/item_menu"
-            android:clickable="true">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Danh sách yêu thích"
-                android:fontFamily="@font/be_vietnam_pro_black"
-                android:textStyle="bold"
-                android:textColor="@color/dark_gray"
-                android:layout_weight="1"
-                android:textSize="16sp"/>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_favorite_border"
-                app:tint="@color/black"
-                android:layout_marginEnd="16dp"/>
-        </LinearLayout>
-
         <!-- Similar layouts for Password, Settings, Help & Support -->
 
         <LinearLayout
@@ -138,6 +110,63 @@
                 android:src="@drawable/bookclock"
                 android:layout_marginEnd="16dp"
                 app:tint="@color/dark_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cartItemAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/item_menu"
+            android:clickable="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giỏ hàng"
+                android:fontFamily="@font/be_vietnam_pro_black"
+                android:layout_weight="1"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                app:tint="@color/black"
+                android:src="@drawable/ic_cart"
+                android:layout_marginEnd="16dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/OrderAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/item_menu"
+            android:clickable="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đơn hàng"
+                android:fontFamily="@font/be_vietnam_pro_black"
+                android:textStyle="bold"
+                android:textColor="@color/dark_gray"
+                android:layout_weight="1"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_order"
+                app:tint="@color/black"
+                android:layout_marginEnd="16dp"/>
         </LinearLayout>
 
         <LinearLayout

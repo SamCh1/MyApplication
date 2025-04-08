@@ -32,7 +32,7 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ImageView profileImage;
     private TextView nameTextView, emailTextView;
-    private LinearLayout accountInfoLayout, logoutButton;
+    private LinearLayout accountInfoLayout, logoutButton, cartItemAccount, OrderAccount;
     private Button returnUser;
 
     @Override
@@ -66,6 +66,8 @@ public class SettingActivity extends AppCompatActivity {
 
         // Khởi tạo view
         profileImage = findViewById(R.id.profileImage);
+        cartItemAccount = findViewById(R.id.cartItemAccount);
+        OrderAccount = findViewById(R.id.OrderAccount);
         nameTextView = findViewById(R.id.nameTextView);
         emailTextView = findViewById(R.id.emailTextView);
         accountInfoLayout = findViewById(R.id.accountInfoLayout);
@@ -86,6 +88,16 @@ public class SettingActivity extends AppCompatActivity {
             //Chuyển trang đến Account Information
             Toast.makeText(this, "Thông tin cá nhân", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, EditProfileActivity.class));
+        });
+
+        cartItemAccount.setOnClickListener(v -> {
+            Toast.makeText(this, "Giỏ hàng", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, CartActivity.class));
+        });
+
+        OrderAccount.setOnClickListener(v -> {
+            Toast.makeText(this, "Giỏ hàng", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, OrderHistoryActivity.class));
         });
 
         // Logout Click

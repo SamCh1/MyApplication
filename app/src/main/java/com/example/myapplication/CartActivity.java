@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -99,6 +100,8 @@ public class CartActivity extends AppCompatActivity {
                     cartItems.clear();
                     cartAdapter.notifyDataSetChanged();
                     updateTotal();
+                    startActivity(new Intent(this, OrderHistoryActivity.class));
+                    finish();
                 } else {
                     Toast.makeText(this, "Lỗi khi tạo hóa đơn", Toast.LENGTH_SHORT).show();
                 }

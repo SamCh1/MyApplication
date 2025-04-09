@@ -21,8 +21,12 @@
             android:layout_height="?attr/actionBarSize"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            app:navigationIcon="@drawable/ic_prev"
             app:title="Lịch sử đơn hàng"
-            app:titleTextColor="#212121" />
+            app:titleTextColor="#212121"
+
+            />
+
 
     </com.google.android.material.appbar.AppBarLayout>
 

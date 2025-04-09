@@ -14,4 +14,15 @@
         <!-- Ensure the status bar icons are dark for visibility on a white background -->
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <style name="MyDatePickerDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorControlActivated">@color/Blue_1976D2</item> <!-- Màu ngày được chọn -->
+        <item name="android:textColorPrimary">@color/black</item> <!-- Màu chữ -->
+        <item name="android:buttonBarPositiveButtonStyle">@style/MyDialogButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/MyDialogButton</item>
+    </style>
+
+    <style name="MyDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/Blue_1976D2</item>
+    </style>
 </resources>

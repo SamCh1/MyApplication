@@ -7,6 +7,7 @@ import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,15 @@ public class OrderHistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_history);
+
+        // Thiết lập Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(true); // Tắt tiêu đề mặc định
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         orderRecyclerView = findViewById(R.id.orderRecyclerView);
         btnFilterDate = findViewById(R.id.btn_filter_date);
@@ -62,7 +72,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+        new DatePickerDialog(this,  R.style.MyDatePickerDialog,(view, year, month, dayOfMonth) -> {
             Calendar selectedCal = Calendar.getInstance();
             selectedCal.set(year, month, dayOfMonth, 0, 0, 0);
             long startTimestamp = selectedCal.getTimeInMillis();
@@ -84,5 +94,11 @@ public class OrderHistoryActivity extends AppCompatActivity {
             }
         }
         orderAdapter.updateList(filtered);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

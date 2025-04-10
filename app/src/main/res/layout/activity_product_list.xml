@@ -10,13 +10,30 @@
     android:background="#111111"
     tools:context=".ProductListActivity">
 
-    <!-- Logo -->
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="34dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/logointro"
-        android:layout_marginBottom="16dp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/audi_logo"
+            android:layout_width="100dp"
+            android:layout_height="34dp"
+            android:src="@drawable/logointro"
+            android:layout_marginBottom="16dp"
+            android:layout_centerHorizontal="true"
+            />
+        <!--Cart logo -->
+        <ImageView
+            android:id="@+id/cart_icon"
+            android:layout_width="50dp"
+            android:layout_height="34dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_cart"
+            app:tint="#FFFFFF"
+            />
+    </RelativeLayout>
 
     <!-- SearchBar -->
     <LinearLayout

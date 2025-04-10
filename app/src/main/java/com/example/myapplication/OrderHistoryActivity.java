@@ -32,6 +32,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_history);
 
+        // Thiết lập Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -71,7 +72,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+        new DatePickerDialog(this,R.style.MyDatePickerDialog, (view, year, month, dayOfMonth) -> {
             Calendar selectedCal = Calendar.getInstance();
             selectedCal.set(year, month, dayOfMonth, 0, 0, 0);
             long startTimestamp = selectedCal.getTimeInMillis();

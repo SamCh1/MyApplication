@@ -226,12 +226,11 @@ public class MainActivity extends AppCompatActivity {
 
         configureBtn.setOnClickListener(v -> {
             Toast.makeText(MainActivity.this, "Configure your car", Toast.LENGTH_SHORT).show();
-            // Chưa xây dựng
+            startActivity(new Intent(MainActivity.this, ProductListActivity.class));
         });
 
         buildYourBtn.setOnClickListener(v -> {
             Toast.makeText(MainActivity.this, "Build your own car", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(MainActivity.this, ProductListActivity.class));
         });
 
         contactBtn.setOnClickListener(v -> {

@@ -1,10 +1,13 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +36,8 @@ public class ProductListActivity extends AppCompatActivity {
     private RecyclerView productRecyclerView;
     private EditText searchBar;
     private ProductAdapter productAdapter;
+    private ImageView cartIcon;
+
     private List<Product> productList = new ArrayList<>();
     private List<Product> allProducts = new ArrayList<>();
 
@@ -48,6 +53,13 @@ public class ProductListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
+        cartIcon = findViewById(R.id.cart_icon);
+        cartIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(ProductListActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
+
+
         productRecyclerView = findViewById(R.id.productRecyclerView);
         searchBar = findViewById(R.id.search_bar);
 
@@ -56,6 +68,9 @@ public class ProductListActivity extends AppCompatActivity {
             Toast.makeText(this, product.getName() + " đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
             // TODO: Thêm vào giỏ hàng trong Firebase
         });
+
+
+
 
         productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         productRecyclerView.setAdapter(productAdapter);
